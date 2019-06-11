@@ -1,0 +1,1 @@
+java -cp .:./client-combined-3.141.59.jar:./libs/* org.junit.runner.JUnitCore MaintainBranchesAndStaffs
