@@ -28,7 +28,7 @@ public class MaintainBranchesAndStaffs {
       d = new FirefoxDriver();
       w = new WebDriverWait(d, 5);
 
-      //System.out.println("init");
+      // System.out.println("init");
 
    }
 
@@ -38,11 +38,11 @@ public class MaintainBranchesAndStaffs {
       d.get("http://localhost:8080");
       assertEquals("gurukula", d.getTitle());
 
-      //System.out.println("Welcome");
+      // System.out.println("Welcome");
 
    }
 
-   //@Ignore
+   // @Ignore
    @Test
    public void loginAsAdmin() {
 
@@ -56,11 +56,11 @@ public class MaintainBranchesAndStaffs {
       assertEquals("You are logged in as user \"admin\".", alertSuccess.getText());
       logout();
 
-      //System.out.println("Login As Admin");
+      // System.out.println("Login As Admin");
 
    }
 
-   //@Ignore
+   // @Ignore
    @Test
    public void logOut() {
 
@@ -70,11 +70,11 @@ public class MaintainBranchesAndStaffs {
       WebElement alertWarning = d.findElement(By.className("alert-warning"));
       assertEquals("Click here to login", alertWarning.getText());
 
-      //System.out.println("Logout");
+      // System.out.println("Logout");
 
    }
 
-   //@Ignore
+   // @Ignore
    @Test
    public void registerUser() {
 
@@ -94,12 +94,12 @@ public class MaintainBranchesAndStaffs {
          assertEquals("Registration failed! Please try again later.", alertDanger.getText());
          fail("Registration failed!");
       }
-  
-      //System.out.println("Register User");
+
+      // System.out.println("Register User");
 
    }
 
-   //@Ignore
+   // @Ignore
    @Test
    public void accountSettings() {
 
@@ -122,11 +122,11 @@ public class MaintainBranchesAndStaffs {
          fail("Settings could not be saved.");
       }
 
-      //System.out.println("Account Settings");
+      // System.out.println("Account Settings");
 
    }
 
-   //@Ignore
+   // @Ignore
    @Test
    public void crudBranch() {
 
@@ -172,13 +172,13 @@ public class MaintainBranchesAndStaffs {
 
       logout();
 
-      //System.out.println("C, R, U, D Branches");
+      // System.out.println("C, R, U, D Branches");
 
    }
-   
-   //@Ignore
+
+   // @Ignore
    @Test
-   public void crudStaff() throws Exception {
+   public void crudStaff() {
 
       login();
       createBranch();
@@ -224,12 +224,12 @@ public class MaintainBranchesAndStaffs {
       deleteBranch();
       logout();
 
-      //System.out.println("C, R, U, D Staffs");
+      // System.out.println("C, R, U, D Staffs");
 
    }
 
    @AfterClass
-   public static void tearDown() throws Exception {
+   public static void tearDown() {
 
       d.close();
       System.out.println("Teardown");
@@ -294,5 +294,5 @@ public class MaintainBranchesAndStaffs {
       w.until(ExpectedConditions.invisibilityOfElementLocated(By.className("modal-backdrop")));
 
    }
-   
+
 }

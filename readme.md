@@ -28,7 +28,7 @@ What to expect:
 
 ## Building
 
-The source file is `MaintainBranchesAndStaffs.java` and can be built using the shell script `MaintainBranchesdAndStaffs.sh`.
+The source file is `MaintainBranchesAndStaffs.java` and can be built using the shell script `buildMaintainBranchesdAndStaffs.sh`.
 
 ## Running
 
@@ -63,3 +63,15 @@ This is implemented by the `registerUser()` test method.
 ### Remarks
 
 Both `accountSettings()` and `registerUser()` tests fail.
+
+Right now, if a test fails it might leave some data behind to be somehow manually cleaned. To prevent this from happening, it would be good to investigate a method to wipe out any leftover upon starting the test. Restarting tomcat is time consuming.
+
+The choices made in this solution are very simple: no integrated environment was used, no sophisticated JUnit runner or build system. This would need to be addressed for future convenient use.
+
+Should, hypothetically, this work make it to a production environment, in order to improve its maintainability, the underlying code would need to be refactored:
+
+1. to help its legibility
+2. to help its extensibility
+
+Therefore a few options exist including applying the PageObject pattern or a gherkin-based test case definition, for example.
+
