@@ -1,0 +1,1 @@
+javac -classpath .:client-combined-3.141.59.jar:./libs/* Pagination.java
