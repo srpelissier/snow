@@ -44,23 +44,44 @@ public class Pagination {
    @Test
    public void branchPagination() {
 
-      createBranches(21);
+      createBranches(0);
       List<WebElement> pager = d.findElements(By.className("pager"));
-      if (pager.size() > 0) {
+      if (pager.size() != 0) {
 
          String[] pagerControls = pagerStatus(pager.get(0));
          assertEquals("visible", pagerControls[0]);
          assertEquals("hidden", pagerControls[1]);
          assertEquals("hidden", pagerControls[2]);
-         assertEquals("visible", pagerControls[3]);
-         deleteAllBranches();
-         logout();
+         assertEquals("hidden", pagerControls[3]);
+
       } else {
-         deleteAllBranches();
+
          logout();
-         fail("Pager not found!");
+         fail("Pager not found in Branches!");
 
       }
+
+      // createBranches(1) {}
+      // Assert pager controls
+
+      // createBranches(20) {}
+      // Assert pager controls
+
+      // Display next page
+      // Assert num_rows
+
+      // Display first page
+      // Assert num_rows
+
+      // Display last page
+      // Assert num_rows
+
+      // Display previous page
+      // Assert num_rows
+
+      // Delete alla branches
+
+      // Log out
 
    }
 
@@ -84,7 +105,7 @@ public class Pagination {
       assertEquals("hidden", pagerControls[2]);
       assertEquals("visible", pagerControls[3]);
 
-      // With 20+ entries it is expect to trigger pagination
+      // 20+ entries to trigger pagination
       createStaffs(20); // Pagination limit
       pager = d.findElement(By.className("pager"));
       pagerControls = pagerStatus(pager);
@@ -176,8 +197,6 @@ public class Pagination {
 
    private void deleteBranch() {
 
-      // d.findElement(By.linkText("Entities")).click();
-      // d.findElement(By.linkText("Branch")).click();
       WebElement branchTable = d.findElement(By.className("table-striped"));
       WebElement deleteBtn = branchTable.findElement(By.className("btn-danger"));
       deleteBtn.click();
@@ -228,8 +247,6 @@ public class Pagination {
 
    private void deleteStaff() {
 
-      // d.findElement(By.linkText("Entities")).click();
-      // d.findElement(By.linkText("Staff")).click();
       WebElement staffTable = d.findElement(By.className("table-striped"));
       WebElement deleteBtn = staffTable.findElement(By.className("btn-danger"));
       deleteBtn.click();
@@ -241,7 +258,8 @@ public class Pagination {
 
    public void login(String userName, String password) {
 
-      d.findElement(By.linkText("login")).click();
+      WebElement loginBtn = w.until(ExpectedConditions.elementToBeClickable(By.linkText("login")));
+      loginBtn.click();
       WebElement authenticateBtn = w.until(ExpectedConditions.visibilityOfElementLocated(By.className("btn-primary")));
       d.findElement(By.id("username")).sendKeys(userName);
       d.findElement(By.id("password")).sendKeys(password);

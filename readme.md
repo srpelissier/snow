@@ -1,13 +1,12 @@
-# Instructions
+# readme.md
 
 ## Dependencies
 
-Use cases are automated in Java using Selenium and JUnit4. No other dependency is required.
+Use cases are automated in Java using Selenium and JUnit4. Test scripts expect Firefox Developer Edition on Linux but this can be changed by edit of the init() method in each.
 
 Selenium Java libraries are linked from [Selenium Client & WebDriver Language Bindings](https://www.seleniumhq.org/download/). Currently using version `3.141.59`.
 
-JUnit 4 libraries are linked from [junit-team/junit4
-](https://github.com/junit-team/junit4/wiki/Download-and-Install). Currently using `junit-4.13-beta-3.jar` and `hamcrest-core-1.3.jar`.
+JUnit 4 libraries are linked from [junit-team/junit4](https://github.com/junit-team/junit4/wiki/Download-and-Install). Currently using `junit-4.13-beta-3.jar` and `hamcrest-core-1.3.jar`.
 
 Please  install them as shown:
 
@@ -28,56 +27,46 @@ snow/
 
 ## Building
 
-The main source file is `MaintainBranchesAndStaffs.java` and can be built using the shell script `buildMaintainBranchesdAndStaffs.sh`. It is using Firefox Developer Edition on Linux (see line #26).
+Use `build.sh` from the project's root.
 
 ## Running
 
-Start "gurukula", build `MaintainBranchesAndStaffs.class` then execute `runMaintainBranchesAndStaffs.sh`.
+Start "gurukula", and use `run.sh` from the project's root.
 
-## Information
+## Details
 
 Please see `task.md` for the initial description of the task
 
-The file `MaintainBranchesAndStaffs.java` consists of a series of tests and support methods corresponding to the described test cases.
+### MaintainBranchesAndStaffs.java
 
-`Pagination.java` takes care of that other test case in a separate file. This work is in progress (see below).
+The file `MaintainBranchesAndStaffs.java` consists of a series of test and support methods corresponding to the prescribed test cases (minus pagination).
 
-### Details
+#### Test case: Viewing, editing, deleting and querying both Staff and Branches
 
-#### Viewing, editing, deleting and querying both Staff and Branches
+That is implemented by the `crudBranch()` and `crudStaff()` test methods following the "CRUD model" (Create, Update, Retrieve, Delete) as indicated by inline comments.
 
-That is implemented by the `crudBranch()` anmd `crudStaff()` test methods following the "CRUD model" (Create, Update, Retrieve, Delete) as indicated by inline comments.
-
-#### Pagination is enabled when viewing the Staff/Branch
-
-**Pagination** is partly implemented for Staffs (TODO: the Previous and Last buttons' actions) in a distinct file `Pagination.java` which could eventually be merged into `MaintainBranchesAndStaffs.java`. See also the associated scripts `buildPagination.sh` and `runPagination.sh`.
-
-#### Logged in account information can be viewed/edited from the Account menu
+#### Test case: Logged in account information can be viewed/edited from the Account menu
 
 This is implemented by the `accountSettings()` test method.
 
-#### Login/Logout as existing user
+#### Test case: Login/Logout as existing user
 
 This is implemented by the `loginAsAdmin()` and `logOut()` test methods using the "**admin**" account.
 
-#### Register a new user
+#### Test case: Register a new user
 
 This is implemented by the `registerUser()` test method.
 
-### Remarks
+### Pagination.java
 
-1. **Failing tests**
-   1. `MaintainBranchesAndStaff.accountSettings`: there is a message in Tomcat log about a CORS viloation.
-   1. `MaintainBranchesAndStaff.registerUser`: there is a message in Tomcat log about a mismatched regular expression for the value of "password".
-   1. `Pagination.branchPagination`: there is no "pager".
+Curently a separate, manageable file, `Pagination.java` will eventually be merged with `MaintainBranchesAndStaffs.java` as they have a lot in common.
 
-1. Right now, when a test fails it might leave some data behind to be somehow manually cleaned. To prevent this from happening, it would be good to investigate a method to wipe out any leftover upon starting the test. Restarting tomcat is time consuming.
+#### Test case: Pagination
 
-1. The choices made in this solution are very simple: no integrated environment was used, no sophisticated JUnit runner or build system. This would need to be addressed for future convenient use.
+Testing Pagination is partly implemented for Staffs (TODO: the Previous and Last buttons' actions) and Branches.
 
-1. Should, hypothetically, this work make it to a production environment, in order to improve its maintainability, the underlying code would need to be refactored:
+### Failing Tests
 
-   1. to help its legibility
-   1. to help its extensibility
-
-1. Therefore a few options exist including applying the PageObject pattern or a gherkin-based test case definition, for example.
+1. `MaintainBranchesAndStaff.accountSettings`: there is a message in Tomcat log about a CORS violation.
+1. `MaintainBranchesAndStaff.registerUser`: there is a message in Tomcat log about a mismatched regular expression for the value of "password".
+1. `Pagination.branchPagination`: there is no "pager".

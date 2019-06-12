@@ -1,1 +1,0 @@
-javac -classpath .:client-combined-3.141.59.jar:./libs/* MaintainBranchesAndStaffs.java
