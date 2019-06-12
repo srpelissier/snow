@@ -1,7 +1,6 @@
 import org.junit.Test;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Ignore;
 import static org.junit.Assert.*;
@@ -13,7 +12,6 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.TimeoutException;
 
 import java.util.Random;
 import java.util.List;
@@ -49,6 +47,7 @@ public class Pagination {
       if (pager.size() != 0) {
 
          String[] pagerControls = pagerStatus(pager.get(0));
+
          assertEquals("visible", pagerControls[0]);
          assertEquals("hidden", pagerControls[1]);
          assertEquals("hidden", pagerControls[2]);
@@ -60,7 +59,6 @@ public class Pagination {
          fail("Pager not found in Branches!");
 
       }
-
       // createBranches(1) {}
       // Assert pager controls
 
@@ -80,7 +78,6 @@ public class Pagination {
       // Assert num_rows
 
       // Delete alla branches
-
       // Log out
 
    }
@@ -92,6 +89,7 @@ public class Pagination {
       createStaffs(0);
       WebElement pager = d.findElement(By.className("pager"));
       String[] pagerControls = pagerStatus(pager);
+
       assertEquals("visible", pagerControls[0]);
       assertEquals("hidden", pagerControls[1]);
       assertEquals("hidden", pagerControls[2]);
@@ -100,6 +98,7 @@ public class Pagination {
       createStaffs(1);
       pager = d.findElement(By.className("pager"));
       pagerControls = pagerStatus(pager);
+
       assertEquals("visible", pagerControls[0]);
       assertEquals("hidden", pagerControls[1]);
       assertEquals("hidden", pagerControls[2]);
@@ -109,6 +108,7 @@ public class Pagination {
       createStaffs(20); // Pagination limit
       pager = d.findElement(By.className("pager"));
       pagerControls = pagerStatus(pager);
+
       assertEquals("visible", pagerControls[0]);
       assertEquals("hidden", pagerControls[1]);
       assertEquals("visible", pagerControls[2]);
@@ -118,27 +118,25 @@ public class Pagination {
       pager = d.findElement(By.className("pager"));
       ((JavascriptExecutor) d).executeScript("arguments[0].scrollIntoView();", pager);
       pager.findElements(By.tagName("li")).get(2).click();
-
       // There should be one row
       WebElement staffTable = d.findElement(By.className("table-striped"));
       List<WebElement> staffTableRows = staffTable.findElements(By.className("ng-scope"));
+
       assertEquals(6, staffTableRows.size()); // num_rows x 4 + 2
 
       // Display first page
       pager = d.findElement(By.className("pager"));
       pager.findElements(By.tagName("li")).get(0).click();
-
       // There should be 20 rows
       staffTable = d.findElement(By.className("table-striped"));
       staffTableRows = staffTable.findElements(By.className("ng-scope"));
+
       assertEquals(82, staffTableRows.size()); // num_rows x 4 + 2
 
       // Display last page
       // There should be one row
-
       // Display previous page
       // There should be 20 rows
-
       deleteAllStaffs();
       logout();
 
@@ -158,15 +156,20 @@ public class Pagination {
       String name = "";
       String code = "";
       for (int currentBranch = 0; currentBranch < total; currentBranch++) {
+
          name = "";
-         int nameSize = (int) ((Math.random() * 16) + 5); // between 5 and 20
+         int nameSize = (int) ((Math.random() * 16) + 5); // between 5 and 20 characters
          for (int i = 0; i < nameSize; i++) {
+
             name += (char) ((Math.random() * 26) + 97); // from 'a' to 'z'
+
          }
          code = "";
          int codeSize = (int) ((Math.random() * 9) + 2);
          for (int i = 0; i < codeSize; i++) {
+
             code += (int) (Math.random() * 10);
+
          }
          createBranch(name, code);
       }
@@ -186,13 +189,17 @@ public class Pagination {
    }
 
    private void deleteAllBranches() {
+
       d.findElement(By.linkText("Entities")).click();
       d.findElement(By.linkText("Branch")).click();
       WebElement branchTable = d.findElement(By.className("table-striped"));
       List<WebElement> branchTableRows = branchTable.findElements(By.className("ng-scope"));
       while (branchTable.findElements(By.className("ng-scope")).size() > 2) {
+
          deleteBranch();
+
       }
+
    }
 
    private void deleteBranch() {
@@ -212,14 +219,20 @@ public class Pagination {
       d.findElement(By.linkText("Staff")).click();
       String name = "";
       for (int currentStaff = 0; currentStaff < total; currentStaff++) {
+
          name = "";
-         int nameSize = (int) ((Math.random() * 50) + 1); // between 1 and 50
+         int nameSize = (int) ((Math.random() * 50) + 1); // between 1 and 50 characters
          for (int i = 0; i < nameSize; i++) {
+
             name += (char) ((Math.random() * 26) + 97); // from 'a' to 'z'
+
+         }
+         if (total > 0) {
+
+            createStaff(name);
+
          }
 
-         if (total > 0)
-            createStaff(name);
       }
 
    }
@@ -241,7 +254,9 @@ public class Pagination {
       WebElement staffTable = d.findElement(By.className("table-striped"));
       List<WebElement> staffTableRows = staffTable.findElements(By.className("ng-scope"));
       while (staffTable.findElements(By.className("ng-scope")).size() > 2) {
+
          deleteStaff();
+
       }
    }
 
@@ -256,7 +271,7 @@ public class Pagination {
 
    }
 
-   public void login(String userName, String password) {
+   private void login(String userName, String password) {
 
       WebElement loginBtn = w.until(ExpectedConditions.elementToBeClickable(By.linkText("login")));
       loginBtn.click();
@@ -267,14 +282,14 @@ public class Pagination {
 
    }
 
-   public void logout() {
+   private void logout() {
 
       d.findElement(By.linkText("Account")).click();
       d.findElement(By.linkText("Log out")).click();
 
    }
 
-   public String[] pagerStatus(WebElement pager) {
+   private String[] pagerStatus(WebElement pager) {
 
       String[] status = new String[4];
       List<WebElement> pagerControls = pager.findElements(By.tagName("li"));

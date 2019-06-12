@@ -1,20 +1,21 @@
-import org.junit.Test;
-import org.junit.Ignore;
-import org.junit.BeforeClass;
-import org.junit.Before;
-import org.junit.AfterClass;
-import org.junit.ComparisonFailure;
 import static org.junit.Assert.*;
 
+import java.util.List;
+
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.Ignore;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.Point;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.By;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
-
-import java.util.List;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class MaintainBranchesAndStaffs {
 
@@ -28,8 +29,6 @@ public class MaintainBranchesAndStaffs {
       d = new FirefoxDriver();
       w = new WebDriverWait(d, 5);
 
-      // System.out.println("init");
-
    }
 
    @Before
@@ -38,25 +37,16 @@ public class MaintainBranchesAndStaffs {
       d.get("http://localhost:8080");
       assertEquals("gurukula", d.getTitle());
 
-      // System.out.println("Welcome");
-
    }
 
    // @Ignore
    @Test
-   public void loginAsAdmin() {
+   public void logIn() {
 
-      d.findElement(By.linkText("login")).click();
-      WebElement authenticateBtn = w.until(ExpectedConditions.visibilityOfElementLocated(By.className("btn-primary")));
-      assertEquals("Authentication", d.getTitle());
-      d.findElement(By.id("username")).sendKeys("admin");
-      d.findElement(By.id("password")).sendKeys("admin");
-      authenticateBtn.click();
+      login("admin", "admin");
       WebElement alertSuccess = d.findElement(By.className("alert-success"));
       assertEquals("You are logged in as user \"admin\".", alertSuccess.getText());
       logout();
-
-      // System.out.println("Login As Admin");
 
    }
 
@@ -64,38 +54,43 @@ public class MaintainBranchesAndStaffs {
    @Test
    public void logOut() {
 
-      login();
+      login("admin", "admin");
+
       assertEquals("gurukula", d.getTitle());
+
       logout();
       WebElement alertWarning = d.findElement(By.className("alert-warning"));
-      assertEquals("Click here to login", alertWarning.getText());
 
-      // System.out.println("Logout");
+      assertEquals("Click here to login", alertWarning.getText());
 
    }
 
    // @Ignore
    @Test
-   public void registerUser() {
+   public void registerUser() throws Exception {
 
-      d.findElement(By.linkText("Register a new account")).click();
+      w.until(ExpectedConditions.elementToBeClickable(By.linkText("Register a new account"))).click();
       WebElement registerBtn = w.until(ExpectedConditions.visibilityOfElementLocated(By.className("btn-primary")));
-      assertEquals("Registration", d.getTitle());
       d.findElement(By.name("login")).sendKeys("testuser");
       d.findElement(By.name("email")).sendKeys("test_user@domain.net");
       d.findElement(By.name("password")).sendKeys("01234");
       d.findElement(By.name("confirmPassword")).sendKeys("01234");
       registerBtn.click();
+
       WebElement alertSuccess = d.findElement(By.className("alert-success"));
       if (alertSuccess.isDisplayed()) {
-         assertEquals("User registered!", alertSuccess.getText());
-      } else {
-         WebElement alertDanger = d.findElement(By.className("alert-danger"));
-         assertEquals("Registration failed! Please try again later.", alertDanger.getText());
-         fail("Registration failed!");
-      }
 
-      // System.out.println("Register User");
+         assertEquals("Registration sa ved! Please check your email for confirmation.", alertSuccess.getText());
+
+      } else {
+
+         WebElement alertDanger = d.findElement(By.className("alert-danger"));
+
+         assertEquals("Registration failed! Please try again later.", alertDanger.getText());
+
+         fail("Registration failed!");
+
+      }
 
    }
 
@@ -103,26 +98,29 @@ public class MaintainBranchesAndStaffs {
    @Test
    public void accountSettings() {
 
-      login();
-
-      assertEquals("gurukula", d.getTitle());
-      d.findElement(By.linkText("Account")).click();
-      d.findElement(By.linkText("Settings")).click();
-      assertEquals("Settings", d.getTitle());
+      login("admin", "admin");
+      w.until(ExpectedConditions.elementToBeClickable(By.linkText("Account"))).click();
+      w.until(ExpectedConditions.elementToBeClickable(By.linkText("Settings"))).click();
       d.findElement(By.name("firstName")).sendKeys("New");
       d.findElement(By.className("btn-primary")).click();
+
       WebElement alertSuccess = d.findElement(By.className("alert-success"));
       if (alertSuccess.isDisplayed()) {
+
          assertEquals("Settings saved!", alertSuccess.getText());
+
          logout();
+
       } else {
-         WebElement alertDanger = d.findElements(By.className("alert-danger")).get(1);
-         assertEquals("An error has occurred! Settings could not be saved.", alertDanger.getText());
+
+         WebElement alertOther = d.findElements(By.className("alert-danger")).get(1); // get(0) is "email in use"
+
+         assertEquals("An error has occurred! Settings could not be saved.", alertOther.getText());
+
          logout();
          fail("Settings could not be saved.");
-      }
 
-      // System.out.println("Account Settings");
+      }
 
    }
 
@@ -130,49 +128,51 @@ public class MaintainBranchesAndStaffs {
    @Test
    public void crudBranch() {
 
-      login();
+      login("admin", "admin");
       createBranch();
-
       // C
       WebElement branchTable = d.findElement(By.className("table-striped"));
       List<WebElement> branchTableRows = branchTable.findElements(By.className("ng-binding"));
-      String id = branchTableRows.get(0).getText();
+      String id = branchTableRows.get(0).getText(); // Compare with Pagination's method
+
       assertEquals("Branch", branchTableRows.get(1).getText());
       assertEquals("BR", branchTableRows.get(2).getText());
       // R
       WebElement viewBtn = branchTable.findElement(By.className("btn-info"));
       viewBtn.click();
-      assertEquals("Branch", d.getTitle());
       WebElement banner = d.findElement(By.className("ng-binding"));
+
       assertEquals("Branch " + id, banner.getText());
-      d.findElement(By.className("btn-info")).click();
+      d.findElement(By.className("btn-info")).click(); // form's Back button
       // U
       branchTable = d.findElement(By.className("table-striped"));
       WebElement editBtn = branchTable.findElement(By.className("btn-primary"));
       editBtn.click();
       WebElement editForm = w.until(ExpectedConditions.visibilityOfElementLocated(By.name("editForm")));
-      editForm.findElement(By.name("name")).sendKeys("renamed");
+      editForm.findElement(By.name("name")).sendKeys("renamed"); // appending
       WebElement saveBtn = editForm.findElement(By.className("btn-primary"));
       saveBtn.click();
       w.until(ExpectedConditions.invisibilityOfElementLocated(By.className("modal-backdrop")));
-      branchTableRows = branchTable.findElements(By.className("ng-binding"));
-      assertEquals("Branchrenamed", branchTableRows.get(1).getText());
-      // D
       branchTable = d.findElement(By.className("table-striped"));
-      WebElement deleteBtn = branchTable.findElement(By.className("btn-danger"));
+      branchTableRows = branchTable.findElements(By.className("ng-binding"));
+
+      assertEquals("Branchrenamed", branchTableRows.get(1).getText()); // assuming this is the most recent branch
+      // D
+      WebElement deleteBtn = branchTable.findElement(By.className("btn-danger")); // assuming it is unique
       deleteBtn.click();
       WebElement deleteForm = w.until(ExpectedConditions.visibilityOfElementLocated(By.name("deleteForm")));
       banner = deleteForm.findElement(By.className("modal-body"));
+
       assertEquals("Are you sure you want to delete Branch " + id + "?", banner.getText());
+
       deleteForm.findElement(By.className("btn-danger")).click();
       w.until(ExpectedConditions.invisibilityOfElementLocated(By.className("modal-backdrop")));
       branchTable = d.findElement(By.className("table-striped"));
       branchTableRows = branchTable.findElements(By.className("ng-binding"));
-      assertEquals(0, branchTableRows.size());
+
+      assertEquals(0, branchTableRows.size()); // no more branch
 
       logout();
-
-      // System.out.println("C, R, U, D Branches");
 
    }
 
@@ -180,22 +180,23 @@ public class MaintainBranchesAndStaffs {
    @Test
    public void crudStaff() {
 
-      login();
+      login("admin", "admin");
       createBranch();
       createStaff();
-
       // C
       WebElement staffTable = d.findElement(By.className("table-striped"));
       List<WebElement> staffTableRows = staffTable.findElements(By.className("ng-binding"));
       String id = staffTableRows.get(0).getText();
+
       assertEquals("Staff Staff", staffTableRows.get(1).getText());
       assertEquals("Branch", staffTableRows.get(2).getText());
       // R
       WebElement viewBtn = staffTable.findElement(By.className("btn-info"));
       viewBtn.click();
-      assertEquals("Staff", d.getTitle());
       WebElement banner = d.findElement(By.className("ng-binding"));
+
       assertEquals("Staff " + id, banner.getText());
+
       d.findElement(By.className("btn-info")).click();
       // U
       staffTable = d.findElement(By.className("table-striped"));
@@ -207,6 +208,7 @@ public class MaintainBranchesAndStaffs {
       saveBtn.click();
       w.until(ExpectedConditions.invisibilityOfElementLocated(By.className("modal-backdrop")));
       staffTableRows = staffTable.findElements(By.className("ng-binding"));
+
       assertEquals("Staff Staffrenamed", staffTableRows.get(1).getText());
       // D
       staffTable = d.findElement(By.className("table-striped"));
@@ -214,17 +216,18 @@ public class MaintainBranchesAndStaffs {
       deleteBtn.click();
       WebElement deleteForm = w.until(ExpectedConditions.visibilityOfElementLocated(By.name("deleteForm")));
       banner = deleteForm.findElement(By.className("modal-body"));
+
       assertEquals("Are you sure you want to delete Staff " + id + "?", banner.getText());
+
       deleteForm.findElement(By.className("btn-danger")).click();
       w.until(ExpectedConditions.invisibilityOfElementLocated(By.className("modal-backdrop")));
       staffTable = d.findElement(By.className("table-striped"));
       staffTableRows = staffTable.findElements(By.className("ng-binding"));
+
       assertEquals(0, staffTableRows.size());
 
       deleteBranch();
       logout();
-
-      // System.out.println("C, R, U, D Staffs");
 
    }
 
@@ -232,7 +235,6 @@ public class MaintainBranchesAndStaffs {
    public static void tearDown() {
 
       d.close();
-      System.out.println("Teardown");
 
    }
 
@@ -258,12 +260,13 @@ public class MaintainBranchesAndStaffs {
 
    }
 
-   private void login() {
+   private void login(String userName, String password) {
 
-      d.findElement(By.linkText("login")).click();
+      WebElement loginBtn = w.until(ExpectedConditions.elementToBeClickable(By.linkText("login")));
+      loginBtn.click();
       WebElement authenticateBtn = w.until(ExpectedConditions.visibilityOfElementLocated(By.className("btn-primary")));
-      d.findElement(By.id("username")).sendKeys("admin");
-      d.findElement(By.id("password")).sendKeys("admin");
+      d.findElement(By.id("username")).sendKeys(userName);
+      d.findElement(By.id("password")).sendKeys(password);
       authenticateBtn.click();
 
    }
