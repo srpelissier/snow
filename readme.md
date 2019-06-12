@@ -50,7 +50,7 @@ That is implemented by the `crudBranch()` anmd `crudStaff()` test methods follow
 
 #### Pagination is enabled when viewing the Staff/Branch
 
-**Pagination** is not fully implemented as an automated test because the details of the feature are unclear. However it's been observed that up to 25 Branches or Staffs there is no pagination. Moreover, while under Staff one can find the necessary navigation controls for pagination, these are absent from under Branch. The file `Pagination.java` is an attempt at testing this which could eventually be merged into `MaintainBranchesAndStaffs.java` after the requirements are made clearer. `Pagination.java` is essentially an extract of the relevant methods from `MaintainBranchesAndStaffs.java` with the ability to generate more Branch/Staff entries. See also the associated scripts `buildPagination.sh` and `RunPagination.sh`.
+**Pagination** is partly implemented for Staffs (TODO: the Previous and Last buttons' actions) in a distinct file `Pagination.java` which could eventually be merged into `MaintainBranchesAndStaffs.java`. See also the associated scripts `buildPagination.sh` and `runPagination.sh`.
 
 #### Logged in account information can be viewed/edited from the Account menu
 
@@ -66,7 +66,10 @@ This is implemented by the `registerUser()` test method.
 
 ### Remarks
 
-1. Both `accountSettings()` and `registerUser()` tests fail.
+1. **Failing tests**
+   1. `MaintainBranchesAndStaff.accountSettings`: there is a message in Tomcat log about a CORS viloation.
+   1. `MaintainBranchesAndStaff.registerUser`: there is a message in Tomcat log about a mismatched regular expression for the value of "password".
+   1. `Pagination.branchPagination`: there is no "pager".
 
 1. Right now, when a test fails it might leave some data behind to be somehow manually cleaned. To prevent this from happening, it would be good to investigate a method to wipe out any leftover upon starting the test. Restarting tomcat is time consuming.
 
@@ -78,4 +81,3 @@ This is implemented by the `registerUser()` test method.
    1. to help its extensibility
 
 1. Therefore a few options exist including applying the PageObject pattern or a gherkin-based test case definition, for example.
-

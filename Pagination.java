@@ -6,6 +6,7 @@ import org.junit.AfterClass;
 import org.junit.Ignore;
 import static org.junit.Assert.*;
 
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -43,9 +44,10 @@ public class Pagination {
    @Test
    public void branchPagination() {
 
-      createBranches(1);
+      createBranches(21);
       List<WebElement> pager = d.findElements(By.className("pager"));
       if (pager.size() > 0) {
+
          String[] pagerControls = pagerStatus(pager.get(0));
          assertEquals("visible", pagerControls[0]);
          assertEquals("hidden", pagerControls[1]);
@@ -54,8 +56,10 @@ public class Pagination {
          deleteAllBranches();
          logout();
       } else {
+         deleteAllBranches();
          logout();
-         fail("Expected condition failed: waiting for element located by By.className: pager");
+         fail("Pager not found!");
+
       }
 
    }
@@ -64,13 +68,56 @@ public class Pagination {
    @Test
    public void staffPagination() {
 
+      createStaffs(0);
+      WebElement pager = d.findElement(By.className("pager"));
+      String[] pagerControls = pagerStatus(pager);
+      assertEquals("visible", pagerControls[0]);
+      assertEquals("hidden", pagerControls[1]);
+      assertEquals("hidden", pagerControls[2]);
+      assertEquals("hidden", pagerControls[3]);
+
       createStaffs(1);
-      List<WebElement> pager = d.findElements(By.className("pager"));
-      String[] pagerControls = pagerStatus(pager.get(0));
+      pager = d.findElement(By.className("pager"));
+      pagerControls = pagerStatus(pager);
       assertEquals("visible", pagerControls[0]);
       assertEquals("hidden", pagerControls[1]);
       assertEquals("hidden", pagerControls[2]);
       assertEquals("visible", pagerControls[3]);
+
+      // With 20+ entries it is expect to trigger pagination
+      createStaffs(20); // Pagination limit
+      pager = d.findElement(By.className("pager"));
+      pagerControls = pagerStatus(pager);
+      assertEquals("visible", pagerControls[0]);
+      assertEquals("hidden", pagerControls[1]);
+      assertEquals("visible", pagerControls[2]);
+      assertEquals("visible", pagerControls[3]);
+
+      // Display next page
+      pager = d.findElement(By.className("pager"));
+      ((JavascriptExecutor) d).executeScript("arguments[0].scrollIntoView();", pager);
+      pager.findElements(By.tagName("li")).get(2).click();
+
+      // There should be one row
+      WebElement staffTable = d.findElement(By.className("table-striped"));
+      List<WebElement> staffTableRows = staffTable.findElements(By.className("ng-scope"));
+      assertEquals(6, staffTableRows.size()); // num_rows x 4 + 2
+
+      // Display first page
+      pager = d.findElement(By.className("pager"));
+      pager.findElements(By.tagName("li")).get(0).click();
+
+      // There should be 20 rows
+      staffTable = d.findElement(By.className("table-striped"));
+      staffTableRows = staffTable.findElements(By.className("ng-scope"));
+      assertEquals(82, staffTableRows.size()); // num_rows x 4 + 2
+
+      // Display last page
+      // There should be one row
+
+      // Display previous page
+      // There should be 20 rows
+
       deleteAllStaffs();
       logout();
 
@@ -85,6 +132,8 @@ public class Pagination {
 
    private void createBranches(int total) {
 
+      d.findElement(By.linkText("Entities")).click();
+      d.findElement(By.linkText("Branch")).click();
       String name = "";
       String code = "";
       for (int currentBranch = 0; currentBranch < total; currentBranch++) {
@@ -105,8 +154,6 @@ public class Pagination {
 
    private void createBranch(String name, String code) {
 
-      d.findElement(By.linkText("Entities")).click();
-      d.findElement(By.linkText("Branch")).click();
       WebElement addBranch = w.until(ExpectedConditions.elementToBeClickable(By.className("btn-primary")));
       addBranch.click();
       WebElement editForm = w.until(ExpectedConditions.visibilityOfElementLocated(By.name("editForm")));
@@ -122,16 +169,15 @@ public class Pagination {
       d.findElement(By.linkText("Branch")).click();
       WebElement branchTable = d.findElement(By.className("table-striped"));
       List<WebElement> branchTableRows = branchTable.findElements(By.className("ng-scope"));
-      // System.out.println(branchTableRows.size());
       while (branchTable.findElements(By.className("ng-scope")).size() > 2) {
-         deleteTopBranch();
+         deleteBranch();
       }
    }
 
-   private void deleteTopBranch() {
+   private void deleteBranch() {
 
-      d.findElement(By.linkText("Entities")).click();
-      d.findElement(By.linkText("Branch")).click();
+      // d.findElement(By.linkText("Entities")).click();
+      // d.findElement(By.linkText("Branch")).click();
       WebElement branchTable = d.findElement(By.className("table-striped"));
       WebElement deleteBtn = branchTable.findElement(By.className("btn-danger"));
       deleteBtn.click();
@@ -143,8 +189,9 @@ public class Pagination {
 
    private void createStaffs(int total) {
 
+      d.findElement(By.linkText("Entities")).click();
+      d.findElement(By.linkText("Staff")).click();
       String name = "";
-      String code = "";
       for (int currentStaff = 0; currentStaff < total; currentStaff++) {
          name = "";
          int nameSize = (int) ((Math.random() * 50) + 1); // between 1 and 50
@@ -152,15 +199,14 @@ public class Pagination {
             name += (char) ((Math.random() * 26) + 97); // from 'a' to 'z'
          }
 
-         createStaff(name);
+         if (total > 0)
+            createStaff(name);
       }
 
    }
 
    private void createStaff(String name) {
 
-      d.findElement(By.linkText("Entities")).click();
-      d.findElement(By.linkText("Staff")).click();
       WebElement addStaff = w.until(ExpectedConditions.elementToBeClickable(By.className("btn-primary")));
       addStaff.click();
       WebElement editForm = w.until(ExpectedConditions.visibilityOfElementLocated(By.name("editForm")));
@@ -175,16 +221,15 @@ public class Pagination {
       d.findElement(By.linkText("Staff")).click();
       WebElement staffTable = d.findElement(By.className("table-striped"));
       List<WebElement> staffTableRows = staffTable.findElements(By.className("ng-scope"));
-      // System.out.println(staffTableRows.size());
       while (staffTable.findElements(By.className("ng-scope")).size() > 2) {
-         deleteTopStaff();
+         deleteStaff();
       }
    }
 
-   private void deleteTopStaff() {
+   private void deleteStaff() {
 
-      d.findElement(By.linkText("Entities")).click();
-      d.findElement(By.linkText("Staff")).click();
+      // d.findElement(By.linkText("Entities")).click();
+      // d.findElement(By.linkText("Staff")).click();
       WebElement staffTable = d.findElement(By.className("table-striped"));
       WebElement deleteBtn = staffTable.findElement(By.className("btn-danger"));
       deleteBtn.click();
