@@ -151,27 +151,12 @@ public class Pagination {
 
    private void createBranches(int total) {
 
-      d.findElement(By.linkText("Entities")).click();
-      d.findElement(By.linkText("Branch")).click();
-      String name = "";
-      String code = "";
+      w.until(ExpectedConditions.elementToBeClickable(By.linkText("Entities"))).click();
+      w.until(ExpectedConditions.elementToBeClickable(By.linkText("Branch"))).click();
       for (int currentBranch = 0; currentBranch < total; currentBranch++) {
 
-         name = "";
-         int nameSize = (int) ((Math.random() * 16) + 5); // between 5 and 20 characters
-         for (int i = 0; i < nameSize; i++) {
+         createBranch("BranchName", "B1");
 
-            name += (char) ((Math.random() * 26) + 97); // from 'a' to 'z'
-
-         }
-         code = "";
-         int codeSize = (int) ((Math.random() * 9) + 2);
-         for (int i = 0; i < codeSize; i++) {
-
-            code += (int) (Math.random() * 10);
-
-         }
-         createBranch(name, code);
       }
 
    }
@@ -215,21 +200,13 @@ public class Pagination {
 
    private void createStaffs(int total) {
 
-      d.findElement(By.linkText("Entities")).click();
-      d.findElement(By.linkText("Staff")).click();
-      String name = "";
+      w.until(ExpectedConditions.elementToBeClickable(By.linkText("Entities"))).click();
+      w.until(ExpectedConditions.elementToBeClickable(By.linkText("Staff"))).click();
       for (int currentStaff = 0; currentStaff < total; currentStaff++) {
 
-         name = "";
-         int nameSize = (int) ((Math.random() * 50) + 1); // between 1 and 50 characters
-         for (int i = 0; i < nameSize; i++) {
-
-            name += (char) ((Math.random() * 26) + 97); // from 'a' to 'z'
-
-         }
          if (total > 0) {
 
-            createStaff(name);
+            createStaff("StaffName");
 
          }
 
